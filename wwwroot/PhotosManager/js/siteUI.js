@@ -1,4 +1,16 @@
 let contentScrollPosition = 0;
+
+Init_UI();
+
+function Init_UI() {
+    renderLogin();
+    $('#aboutCmd').on("click", function () {
+        renderAbout();
+    });
+}
+
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Views rendering
 function showWaitingGif() {
