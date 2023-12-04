@@ -139,12 +139,8 @@ function renderHeader(){
     </div>
         </div>
         </div>
-        
-        
-  
         `))
 }
-
 
 function renderAbout() {
     timeout();
@@ -171,17 +167,18 @@ function renderAbout() {
         `))
 }
 
-function renderLogin() {
+function renderLogin(Email = "", EmailError = "", passwordError = "", loginMessage = "") {
 
-    let loginMessage = "";
-    let Email = "";
-    let EmailError = "";
-    let passwordError = "";
-
-    timeout();
-    saveContentScrollPosition();
+    API.logout();
     eraseContent();
-    //UpdateHeader("À propos...", "about");
+    noTimeout();
+    updateHeader("Connexion", "Login");
+    if (EmailError == undefined) {
+        EmailError = "";
+    }
+    if (Email == '[object Object]') {
+        Email = "";
+    }
 
     $("#content").append(
         $(`
@@ -215,19 +212,7 @@ function renderLogin() {
 
         
         `))
-
-        var createAccount = document.getElementById("createProfilCmd");
-
-        createAccount.addEventListener("click", function () {
-            renderRegister();
-        });
-
-        if (EmailError == undefined) {
-            EmailError = "";
-        }
-        if (Email == '[object Object]') {
-            Email = "";
-        }
+        $('#createProfilCmd').on('click', renderRegister);
 
         $('#loginForm').on("submit", async function (event) {
             let loginInfo = getFormData($('#loginForm'))
@@ -262,15 +247,13 @@ function renderLogin() {
                 }
             }
         });
-        
 }
 
 
 function renderRegister() {
-    timeout();
-    saveContentScrollPosition();
+    noTimeout();
     eraseContent();
-    //UpdateHeader("À propos...", "about");
+    updateHeader("Inscription", "createProfil");
 
     $("#content").append(
         $(`
@@ -340,5 +323,11 @@ function renderRegister() {
         <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
         </div>
         `))
+
+        $('#loginCmd').on('click', renderLogin);
+        $('#abortCmd').on('click', renderLogin);
+        initFormValidation();
+        initImageUploaders();
+
 }
 
