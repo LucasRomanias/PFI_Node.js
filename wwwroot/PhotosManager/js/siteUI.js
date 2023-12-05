@@ -38,7 +38,6 @@ function restoreContentScrollPosition() {
 async function createProfil(profil) {
     let result = await API.register(profil)
     if (result) {
-        // Smtp variables are set in serverVariables.ini
         renderLogin("", "", "", "Votre compte a été créé. Veuillez prendre vos courriels pour réccupérer votre code de vérification qui vous sera demandé lors de votre prochaine connexion.");
     }
     else {
@@ -62,225 +61,224 @@ function getFormData($form) {
 function renderImages() {
     timeout();
     eraseContent();
-    updateHeader('Liste des photos', 'connected')
+    updateHeader('Liste des photos', 'connected');
     $("#content").append(
         $(`
         <h2 style="margin-left:20px; margin-top:20px">En construction</h2>
         `))
 }
 
-function updateHeader(text, cmd) {
-   
-}
 
-function renderHeader() {                                                                                      // On affiche le header de base (Guest)
-    timeout();
-    saveContentScrollPosition();
-    eraseContent();
+function updateHeader(title, type) {                                                                                                        // On met à jour le header selon le type de page
+    $("#header").empty();
+    if (type == 'createProfil' || type == 'Login') {
+        $("#header").append($(`<img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
+        <div class="dropdown ms-auto dropdownLayout"> 
+            <div data-bs-toggle="dropdown" aria-expanded="false"> 
+                <i class="cmdIcon fa fa-ellipsis-vertical"></i> 
+            </div>
+            <div class="dropdown-menu noselect">
+            <span class="dropdown-item" id="loginCmd"> 
+                <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion 
+            </span>
+            <div class="dropdown-divider"></div> 
+            <span class="dropdown-item" id="aboutCmd"> 
+                <i class="menuIcon fa fa-info-circle mx-2" id='aboutCmd'></i> À propos... </span>
+            </div> 
+        </div>`));
+    }
+    else if (type == "connected") {                                                                                                             // On affiche le header lorsqu'on est connecté
+        if (API.retrieveLoggedUser() != undefined) {
+            let user = API.retrieveLoggedUser();
+            let isAdmin = "";
+            if (user.Authorizations.readAccess == 2 && user.Authorizations.writeAccess == 2) {
+                isAdmin = `<span class="dropdown-item" id="manageUserCm">
+                <i class="menuIcon fas fa-user-cog mx-2"></i> 
+                Gestion des usagers 
+                </span>
+                <div class="dropdown-divider"></div>`;
+            }
 
-    $("#header").append(
-        $(`
-        <span title="Liste des photos" id="listPhotosCmd">
-        <img src="images/PhotoCloudLogo.png" class="appLogo">
-         </span>
-        <span class="viewTitle">Liste des photos
-        <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
-        </span>
-        <div class="headerMenusContainer">
-        <span>&nbsp;</span> <!--filler-->
-        <i title="Modifier votre profil">
-        <div class="UserAvatarSmall" userid="" id="editProfilCmd"
-        style="background-image:url('')"
-        title="Nicolas Chourot"></div>
-        </i>
+            $("#header").append($(`
+            <img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
+            <img id='UserAvatarSmall' class='UserAvatarSmall' src='${user.Avatar}'>
+             <div class="dropdown ms-auto dropdownLayout">
+            <div data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="cmdIcon fa fa-ellipsis-vertical"></i>
+            </div>
+            <div class="dropdown-menu noselect">
+            ${isAdmin}
+            <span class="dropdown-item" id="logoutCmd">
+            <i class="menuIcon fa fa-sign-out mx-2"></i>
+            Déconnexion 
+            </span>
+            <span class="dropdown-item" id="editProfilMenuCmd">
+            <i class="menuIcon fa fa-user-edit mx-2"></i>
+            Modifier votre profil
+            </span> <div class="dropdown-divider">
+            </div> <span class="dropdown-item" id="listPhotosMenuCmd">
+            <i class="menuIcon fa fa-image mx-2"></i>
+            Liste des photos 
+            </span>
+            <div class="dropdown-divider"></div> 
+            <span class="dropdown-item" id="sortByDateCmd"> 
+            <i class="menuIcon fa fa-check mx-2"></i>
+            <i class="menuIcon fa fa-calendar mx-2"></i> 
+            Photos par date de création 
+            </span> 
+            <span class="dropdown-item" id="sortByOwnersCmd"> 
+            <i class="menuIcon fa fa-fw mx-2"></i> 
+            <i class="menuIcon fa fa-users mx-2"></i> 
+            Photos par créateur 
+            </span> 
+            <span class="dropdown-item" id="sortByLikesCmd"> 
+            <i class="menuIcon fa fa-fw mx-2"></i> 
+            <i class="menuIcon fa fa-user mx-2"></i> 
+            Photos les plus aiméés 
+            </span> 
+            <span class="dropdown-item" id="ownerOnlyCmd"> 
+            <i class="menuIcon fa fa-fw mx-2"></i> 
+            <i class="menuIcon fa fa-user mx-2"></i> 
+            Mes photos 
+            </span> 
+            <div class="dropdown-divider"></div> 
+            <span class="dropdown-item" id="aboutCmd"> 
+            <i class="menuIcon fa fa-info-circle mx-2"></i> 
+            À propos... 
+            </span> 
+            </div> 
+            </div>`));
+        }
+    }
+    else if (type == 'verif') {                                                                                                 // On affiche le header lorsqu'on est en vérification
+        $("#header").append($(`<img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
+        <div class="dropdown ms-auto dropdownLayout"> 
+            <div data-bs-toggle="dropdown" aria-expanded="false"> 
+                <i class="cmdIcon fa fa-ellipsis-vertical"></i> 
+            </div>
+            <div class="dropdown-menu noselect">
+            <span class="dropdown-item" id="logoutCmd"> 
+                <i class="menuIcon fa fa-sign-out mx-2"></i> Déconnexion 
+            </span>
+            <div class="dropdown-divider"></div> 
+            <span class="dropdown-item" id="aboutCmd"> 
+                <i class="menuIcon fa fa-info-circle mx-2" id='aboutCmd'></i> À propos... </span>
+            </div> 
+        </div>`));
+    }
+    else if (type == "about") {                                                                                                 // On affiche le header lorsqu'on est sur la page À propos
+        let user = API.retrieveLoggedUser();
+        if (user != null) {
+            if (user.VerifyCode == 'verified') {
+                $("#header").append($(`
+            <img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
+            <img id='avatarUser' class='UserAvatarSmall' src='${user.Avatar}'>
+             <div class="dropdown ms-auto dropdownLayout"> <div data-bs-toggle="dropdown" aria-expanded="false"> <i class="cmdIcon fa fa-ellipsis-vertical"></i> </div> <div class="dropdown-menu noselect"> <span class="dropdown-item" id="manageUserCm"> <i class="menuIcon fas fa-user-cog mx-2"></i> Gestion des usagers </span> <div class="dropdown-divider"></div> <span class="dropdown-item" id="logoutCmd"> <i class="menuIcon fa fa-sign-out mx-2"></i> Déconnexion </span> <span class="dropdown-item" id="editProfilMenuCmd"> <i class="menuIcon fa fa-user-edit mx-2"></i> Modifier votre profil </span> <div class="dropdown-divider"></div> <span class="dropdown-item" id="listPhotosMenuCmd"> <i class="menuIcon fa fa-image mx-2"></i> Liste des photos </span> <div class="dropdown-divider"></div> <span class="dropdown-item" id="sortByDateCmd"> <i class="menuIcon fa fa-check mx-2"></i> <i class="menuIcon fa fa-calendar mx-2"></i> Photos par date de création </span> <span class="dropdown-item" id="sortByOwnersCmd"> <i class="menuIcon fa fa-fw mx-2"></i> <i class="menuIcon fa fa-users mx-2"></i> Photos par créateur </span> <span class="dropdown-item" id="sortByLikesCmd"> <i class="menuIcon fa fa-fw mx-2"></i> <i class="menuIcon fa fa-user mx-2"></i> Photos les plus aiméés </span> <span class="dropdown-item" id="ownerOnlyCmd"> <i class="menuIcon fa fa-fw mx-2"></i> <i class="menuIcon fa fa-user mx-2"></i> Mes photos </span> <div class="dropdown-divider"></div> <span class="dropdown-item" id="aboutCmd"> <i class="menuIcon fa fa-info-circle mx-2"></i> À propos... </span> </div> </div>`));
+            }
+            else {
+                $("#header").append($(`<img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
+                <div class="dropdown ms-auto dropdownLayout"> 
+                    <div data-bs-toggle="dropdown" aria-expanded="false"> 
+                        <i class="cmdIcon fa fa-ellipsis-vertical"></i> 
+                    </div>
+                    <div class="dropdown-menu noselect">
+                    <span class="dropdown-item" id="loginCmd"> 
+                        <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion 
+                    </span>
+                    <div class="dropdown-divider"></div> 
+                    <span class="dropdown-item" id="aboutCmd"> 
+                        <i class="menuIcon fa fa-info-circle mx-2" id='aboutCmd'></i> À propos... </span>
+                    </div> 
+                </div>`));
+            }
+        }
+        else {
+            $("#header").append($(`<img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
+            <div class="dropdown ms-auto dropdownLayout"> 
+                <div data-bs-toggle="dropdown" aria-expanded="false"> 
+                    <i class="cmdIcon fa fa-ellipsis-vertical"></i> 
+                </div>
+                <div class="dropdown-menu noselect">
+                <span class="dropdown-item" id="logoutCmd"> 
+                    <i class="menuIcon fa fa-sign-out mx-2"></i> Déconnexion 
+                </span>
+                <div class="dropdown-divider"></div> 
+                <span class="dropdown-item" id="aboutCmd"> 
+                    <i class="menuIcon fa fa-info-circle mx-2" id='aboutCmd'></i> À propos... </span>
+                </div> 
+            </div>`));
+        }
+    }
+    else if (type == "UsersManager") {                                                                                                  // On affiche le header lorsqu'on est sur la page Gestion des usagers
+        let user = API.retrieveLoggedUser();
+        $("#header").append($(`<img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
+        <img id='UserAvatarSmall' class='UserAvatarSmall' src='./images/adminLogo.png'>
         <div class="dropdown ms-auto dropdownLayout">
         <div data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="cmdIcon fa fa-ellipsis-vertical"></i>
-    </div>
-    <div class="dropdown-menu noselect">
-        <div class="dropdown-item" id="loginCmd">
-            <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
+            <i class="cmdIcon fa fa-ellipsis-vertical"></i>
         </div>
-        <div class="dropdown-divider"></div>
-
-        <div class="dropdown-item" id="aboutCmd">
-            <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
-        </div>
-    </div>
-        </div>
-        </div>
-        `))
-}
-
-function renderHeaderUser(){                                                                     // On affiche le header de base (User)
-    timeout();
-    saveContentScrollPosition();
-    eraseContent();
-
-    $("#header").append(
-        $(`
-        <span title="Liste des photos" id="listPhotosCmd">
-            <img src="images/PhotoCloudLogo.png" class="appLogo">
-        </span>
-
-        <span class="viewTitle">Liste des photos
-            <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
-        </span>
-
-        <div class="headerMenusContainer">
-            <span>&nbsp;</span> <!--filler-->
-
-            <i title="Modifier votre profil">
-                <div class="UserAvatarSmall" userid="" id="editProfilCmd"
-                    style="background-image:url('')"
-                    title="Nicolas Chourot">
-                </div>
-            </i>
-        <div class="dropdown ms-auto dropdownLayout">
-            <div data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="cmdIcon fa fa-ellipsis-vertical"></i>
-            </div>
-
-
-
-            <div class="dropdown-menu noselect">
-            <span class="dropdown-item" id="logoutCmd">
-            <i class="menuIcon fa fa-sign-out mx-2"></i>
-            Déconnexion
-            </span>
-            <span class="dropdown-item" id="editProfilMenuCmd">
-            <i class="menuIcon fa fa-user-edit mx-2"></i>
-            Modifier votre profil
-            </span>
-            <div class="dropdown-divider"></div>
-            <span class="dropdown-item" id="listPhotosMenuCmd">
-            <i class="menuIcon fa fa-image mx-2"></i>
-            Liste des photos
-            </span>
-            <div class="dropdown-divider"></div>
-            <span class="dropdown-item" id="sortByDateCmd">
-            <i class="menuIcon fa fa-check mx-2"></i>
-            <i class="menuIcon fa fa-calendar mx-2"></i>
-            Photos par date de création
-            </span>
-            <span class="dropdown-item" id="sortByOwnersCmd">
-            <i class="menuIcon fa fa-fw mx-2"></i>
-            <i class="menuIcon fa fa-users mx-2"></i>
-            Photos par créateur
-            </span>
-            <span class="dropdown-item" id="sortByLikesCmd">
-            <i class="menuIcon fa fa-fw mx-2"></i>
-            <i class="menuIcon fa fa-user mx-2"></i>
-            Photos les plus aiméés
-            </span>
-            <span class="dropdown-item" id="ownerOnlyCmd">
-            <i class="menuIcon fa fa-fw mx-2"></i>
-            <i class="menuIcon fa fa-user mx-2"></i>
-            Mes photos
-            </span>
-            <div class="dropdown-divider"></div>
-            <span class="dropdown-item" id="aboutCmd">
-            <i class="menuIcon fa fa-info-circle mx-2"></i>
-            À propos...
-            </span>
-            </div>
-
-        </div>
-        </div>
-        `))
-
-}
-
-
-function renderHeaderAdmin(){                                                 // On affiche le header de base (Admin)
-    timeout();
-    saveContentScrollPosition();
-    eraseContent();
-
-    $("#header").append(
-        $(`
-        <span title="Liste des photos" id="listPhotosCmd">
-            <img src="images/PhotoCloudLogo.png" class="appLogo">
-        </span>
-
-        <span class="viewTitle">Liste des photos
-            <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
-        </span>
-
-        <div class="headerMenusContainer">
-            <span>&nbsp;</span> <!--filler-->
-
-            <i title="Modifier votre profil">
-                <div class="UserAvatarSmall" userid="" id="editProfilCmd"
-                    style="background-image:url('')"
-                    title="Nicolas Chourot">
-                </div>
-            </i>
-        <div class="dropdown ms-auto dropdownLayout">
-            <div data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="cmdIcon fa fa-ellipsis-vertical"></i>
-            </div>
-
-
-
-            <div class="dropdown-menu noselect">
+        <div class="dropdown-menu noselect">
             <span class="dropdown-item" id="manageUserCm">
-            <i class="menuIcon fas fa-user-cog mx-2"></i>
-            Gestion des usagers
+                <i class="menuIcon fas fa-user-cog mx-2"></i> 
+                Gestion des usagers 
             </span>
-            <div class="dropdown-divider"></div>
+        <div class="dropdown-divider"></div>
             <span class="dropdown-item" id="logoutCmd">
             <i class="menuIcon fa fa-sign-out mx-2"></i>
-            Déconnexion
+            Déconnexion 
             </span>
             <span class="dropdown-item" id="editProfilMenuCmd">
             <i class="menuIcon fa fa-user-edit mx-2"></i>
             Modifier votre profil
-            </span>
-            <div class="dropdown-divider"></div>
-            <span class="dropdown-item" id="listPhotosMenuCmd">
+            </span> <div class="dropdown-divider">
+        </div> 
+        <span class="dropdown-item" id="listPhotosMenuCmd">
             <i class="menuIcon fa fa-image mx-2"></i>
-            Liste des photos
-            </span>
-            <div class="dropdown-divider"></div>
-            <span class="dropdown-item" id="sortByDateCmd">
-            <i class="menuIcon fa fa-check mx-2"></i>
-            <i class="menuIcon fa fa-calendar mx-2"></i>
-            Photos par date de création
-            </span>
-            <span class="dropdown-item" id="sortByOwnersCmd">
-            <i class="menuIcon fa fa-fw mx-2"></i>
-            <i class="menuIcon fa fa-users mx-2"></i>
-            Photos par créateur
-            </span>
-            <span class="dropdown-item" id="sortByLikesCmd">
-            <i class="menuIcon fa fa-fw mx-2"></i>
-            <i class="menuIcon fa fa-user mx-2"></i>
-            Photos les plus aiméés
-            </span>
-            <span class="dropdown-item" id="ownerOnlyCmd">
-            <i class="menuIcon fa fa-fw mx-2"></i>
-            <i class="menuIcon fa fa-user mx-2"></i>
-            Mes photos
-            </span>
-            <div class="dropdown-divider"></div>
-            <span class="dropdown-item" id="aboutCmd">
-            <i class="menuIcon fa fa-info-circle mx-2"></i>
-            À propos...
-            </span>
-            </div>
-
-        </div>
-        </div>
-        `))
-
+            Liste des photos 
+        </span>
+        <div class="dropdown-divider"></div> 
+            <span class="dropdown-item" id="sortByDateCmd"> 
+                <i class="menuIcon fa fa-check mx-2"></i>
+                <i class="menuIcon fa fa-calendar mx-2"></i> 
+                Photos par date de création 
+            </span> 
+            <span class="dropdown-item" id="sortByOwnersCmd"> 
+                <i class="menuIcon fa fa-fw mx-2"></i> 
+                <i class="menuIcon fa fa-users mx-2"></i> 
+                Photos par créateur 
+            </span> 
+            <span class="dropdown-item" id="sortByLikesCmd"> 
+                <i class="menuIcon fa fa-fw mx-2"></i> 
+                <i class="menuIcon fa fa-user mx-2"></i> 
+                Photos les plus aiméés 
+            </span> 
+            <span class="dropdown-item" id="ownerOnlyCmd"> 
+                <i class="menuIcon fa fa-fw mx-2"></i> 
+                <i class="menuIcon fa fa-user mx-2"></i> 
+                Mes photos 
+            </span> 
+            <div class="dropdown-divider"></div> 
+                <span class="dropdown-item" id="aboutCmd"> 
+                    <i class="menuIcon fa fa-info-circle mx-2"></i> 
+                    À propos... 
+                </span> 
+            </div> 
+        </div>`));
+    }
+    $('#loginCmd').on('click', renderLogin);
+    $('#aboutCmd').on('click', renderAbout);
+    $('#logoutCmd').on('click', renderlogout);
+    $('#editProfilMenuCmd').on('click', renderModify);
+    $('#manageUserCm').on('click', renderUserManager);
 }
+
+
 
 function renderAbout() {                                                                                            // On affiche la page À propos
     timeout();
     saveContentScrollPosition();
     eraseContent();
-    //UpdateHeader("À propos...", "about");
+    updateHeader("À propos...", "about");
 
     $("#content").append(
         $(`
@@ -306,7 +304,7 @@ function renderLogin(Email = "", EmailError = "", passwordError = "", loginMessa
     API.logout();
     eraseContent();
     noTimeout();
-    //updateHeader("Connexion", "Login");
+    updateHeader("Connexion", "Login");
     if (EmailError == undefined) {
         EmailError = "";
     }
