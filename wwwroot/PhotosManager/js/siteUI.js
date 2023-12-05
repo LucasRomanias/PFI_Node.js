@@ -269,7 +269,7 @@ function updateHeader(title, type) {                                            
     $('#aboutCmd').on('click', renderAbout);
     $('#logoutCmd').on('click', renderlogout);
     $('#editProfilMenuCmd').on('click', renderModify);
-    $('#manageUserCm').on('click', renderUserManager);
+   // $('#manageUserCm').on('click', renderUserManager);
 }
 
 
