@@ -4,20 +4,8 @@ let contentScrollPosition = 0;
 Init_UI();
 
 function Init_UI() {                                                                                        // On initialise l'interface utilisateur
-
-
     renderLogin();
-
-    renderHeader();
-    $('#aboutCmd').on("click", function () {
-        renderAbout();
-    });
-
-    $('#loginCmd').on("click", function () {
-        renderLogin();
-    });
-
-
+    initTimeout(200, renderLogin);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +371,7 @@ function renderLogin(Email = "", EmailError = "", passwordError = "", loginMessa
 
 function renderVerifyForm() {                                                                                // On vérifie notre courriel pour pouvoir se connecter
     eraseContent();
-    timeout();
+    noTimeout();
     updateHeader("Vérification", "verif");
     $("#content").append($(`
     <div class="content" style="text-align:center">

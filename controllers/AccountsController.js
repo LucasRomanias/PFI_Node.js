@@ -24,7 +24,7 @@ export default class AccountsController extends Controller {
                 this.HttpContext.response.unAuthorized("Unauthorized access");
         }
     }
-    // POST: /token body payload[{"Email": "...", "Password": "..."}]
+    
     login(loginInfo) {
         if (loginInfo) {
             if (this.repository != null) {
@@ -53,8 +53,10 @@ export default class AccountsController extends Controller {
             this.HttpContext.response.badRequest("UserId is not specified.")
         }
     }
+
     sendVerificationEmail(user) {
-        // bypass model bindeExtraData wich hide the user verifyCode
+        
+        user = this.repository.findByField("Id", user.Id);
         let html = `
                 Bonjour ${user.Name}, <br /> <br />
                 Voici votre code pour confirmer votre adresse de courriel
@@ -64,6 +66,7 @@ export default class AccountsController extends Controller {
         const gmail = new Gmail();
         gmail.send(user.Email, 'Vérification de courriel...', html);
     }
+
     sendConfirmedEmail(user) {
         let html = `
                 Bonjour ${user.Name}, <br /> <br />
@@ -72,7 +75,8 @@ export default class AccountsController extends Controller {
         const gmail = new Gmail();
         gmail.send(user.Email, 'Courriel confirmé...', html);
     }
-    //GET : /accounts/verify?id=...&code=.....
+
+    
     verify() {
         if (this.repository != null) {
             let id = this.HttpContext.path.params.id;
@@ -97,7 +101,6 @@ export default class AccountsController extends Controller {
         } else
             this.HttpContext.response.notImplemented();
     }
-    //GET : /accounts/conflict?Id=...&Email=.....
     conflict() {
         if (this.repository != null) {
             let id = this.HttpContext.path.params.Id;
@@ -110,18 +113,16 @@ export default class AccountsController extends Controller {
         } else
             this.HttpContext.response.updated(false);
     }
-    // POST: account/register body payload[{"Id": 0, "Name": "...", "Email": "...", "Password": "..."}]
+
     register(user) {
         if (this.repository != null) {
             user.Created = utilities.nowInSeconds();
-            let verifyCode = utilities.makeVerifyCode(6);
-            user.VerifyCode = verifyCode;
+            user.VerifyCode = utilities.makeVerifyCode(6);
             user.Authorizations = Authorizations.user();
             let newUser = this.repository.add(user);
             if (this.repository.model.state.isValid) {
                 this.HttpContext.response.created(newUser);
-                newUser.Verifycode = verifyCode;
-                this.sendVerificationEmail(newUser);
+                this.sendVerificationEmail(user);
             } else {
                 if (this.repository.model.state.inConflict)
                     this.HttpContext.response.conflict(this.repository.model.state.errors);
@@ -131,18 +132,20 @@ export default class AccountsController extends Controller {
         } else
             this.HttpContext.response.notImplemented();
     }
-    // PUT:account/modify body payload[{"Id": 0, "Name": "...", "Email": "...", "Password": "..."}]
+
     modify(user) {
-        // empty asset members imply no change and there values will be taken from the stored record
+
         if (Authorizations.writeGranted(this.HttpContext, Authorizations.user())) {
             if (this.repository != null) {
                 user.Created = utilities.nowInSeconds();
                 let foundedUser = this.repository.findByField("Id", user.Id);
                 if (foundedUser != null) {
-                    user.Authorizations = foundedUser.Authorizations; // user cannot change its own authorizations
-                    if (user.Password == '') { // password not changed
+                    user.Authorizations = foundedUser.Authorizations; 
+                    user.VerifyCode = foundedUser.VerifyCode;
+                    if (user.Password == '') { 
                         user.Password = foundedUser.Password;
                     }
+                    user.Authorizations = foundedUser.Authorizations;
                     if (user.Email != foundedUser.Email) {
                         user.VerifyCode = utilities.makeVerifyCode(6);
                         this.sendVerificationEmail(user);
@@ -164,8 +167,8 @@ export default class AccountsController extends Controller {
         } else
             this.HttpContext.response.unAuthorized();
     }
-    // GET:account/remove/id
-    remove(id) { // warning! this is not an API endpoint
+   
+    remove(id) { 
         if (Authorizations.writeGranted(this.HttpContext, Authorizations.user())) {
             this.tokensRepository.keepByFilter(token => token.User.Id != id);
             let previousAuthorization = this.authorizations;
@@ -173,5 +176,44 @@ export default class AccountsController extends Controller {
             super.remove(id);
             this.authorizations = previousAuthorization;
         }
+    }
+
+    promote(id) {
+        if (Authorizations.writeGranted(this.HttpContext, Authorizations.admin())) {
+            let user = this.repository.findByField("Id",id);
+            user.Authorizations = Authorizations.admin();
+            let updatedUser = this.repository.update(id, user);
+            if (this.repository.model.state.isValid) {
+                this.HttpContext.response.updated(updatedUser);
+            }
+        } else {
+            this.HttpContext.response.unAuthorized("Unauthorized access");
+        }
+    }
+
+    demote(id) {
+        if (Authorizations.writeGranted(this.HttpContext, Authorizations.admin())) {
+            let user = this.repository.findByField("Id",id);
+            user.Authorizations = Authorizations.user();
+            let updatedUser = this.repository.update(id, user);
+            if (this.repository.model.state.isValid) {
+                this.HttpContext.response.updated(updatedUser);
+            }
+        } else {
+            this.HttpContext.response.unAuthorized("Unauthorized access");
+        }
+    }
+    block(id){
+        if (Authorizations.writeGranted(this.HttpContext, Authorizations.admin())) {
+            let user = this.repository.findByField("Id",id);
+            user.Authorizations = Authorizations.anonymous();
+            let updatedUser = this.repository.update(id, user);
+            if (this.repository.model.state.isValid) {
+                this.HttpContext.response.updated(updatedUser);
+            }
+        } else {
+            this.HttpContext.response.unAuthorized("Unauthorized access");
+        }
+
     }
 }
