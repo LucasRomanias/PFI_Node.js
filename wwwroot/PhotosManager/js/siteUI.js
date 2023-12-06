@@ -1,6 +1,15 @@
 let contentScrollPosition = 0;
 
 
+
+
+                                                            /* ----------------------------- Section d'initialisation ----------------------------- */
+
+
+
+
+
+
 Init_UI();
 
 function Init_UI() {                                                                                        // On initialise l'interface utilisateur
@@ -8,8 +17,14 @@ function Init_UI() {                                                            
     initTimeout(200, renderLogin);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Views rendering
+
+
+
+                                                                /* ----------------------------- Fonctions utiles ----------------------------- */
+
+
+
+
 function showWaitingGif() {
     eraseContent();
     $("#content").append($("<div class='waitingGifcontainer'><img class='waitingGif' src='images/Loading_icon.gif' /></div>'"));
@@ -33,12 +48,7 @@ async function createProfil(profil) {
     }
 
 }
-function renderlogout() {
-    API.logout()
-    updateHeader("Connexion", 'Login');
-    renderLogin()
-}
-function getFormData($form) {
+function getFormData($form) { // On récupère les données du formulaire
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
     var jsonObject = {};
     $.each($form.serializeArray(), (index, control) => {
@@ -46,15 +56,12 @@ function getFormData($form) {
     });
     return jsonObject;
 }
-function renderImages() {
-    timeout();
-    eraseContent();
-    updateHeader('Liste des photos', 'connected');
-    $("#content").append(
-        $(`
-        <h2 style="margin-left:20px; margin-top:20px">En construction</h2>
-        `))
-}
+
+
+
+        /* ----------------------------- Section que l'on Update le header selon le type de page  ainsi que les types de permissions de l'utilisateur -----------------------------  */
+
+
 
 
 function updateHeader(title, type) {                                                                                                        // On met à jour le header selon le type de page
@@ -197,7 +204,7 @@ function updateHeader(title, type) {                                            
             </div>`));
         }
     }
-    else if (type == "UsersManager") {                                                                                                  // On affiche le header lorsqu'on est sur la page Gestion des usagers
+    else if (type == "UsersManager") {                                                                                              // On affiche le header lorsqu'on est sur la page Gestion des usagers
         let user = API.retrieveLoggedUser();
         $("#header").append($(`<img id='photoTitleContainer' src='./favicon.ico'/><h2>${title}</h2>
         <img id='UserAvatarSmall' class='UserAvatarSmall' src='./images/adminLogo.png'>
@@ -253,20 +260,46 @@ function updateHeader(title, type) {                                            
             </div> 
         </div>`));
     }
-    $('#loginCmd').on('click', renderLogin);
-    $('#aboutCmd').on('click', renderAbout);
-    $('#logoutCmd').on('click', renderlogout);
-    $('#editProfilMenuCmd').on('click', renderModify);
-   // $('#manageUserCm').on('click', renderUserManager);
+    $('#loginCmd').on('click', renderLogin); // Quand on clique sur le bouton connexion
+    $('#aboutCmd').on('click', renderAbout); // Quand on clique sur le bouton À propos
+    $('#logoutCmd').on('click', renderlogout); // Quand on clique sur le bouton Déconnexion
+    $('#editProfilMenuCmd').on('click', renderModify); // Quand on clique sur le bouton Modifier votre profil
+    $('#manageUserCm').on('click', renderUserManager); // Quand on clique sur le bouton Gestion des usagers
 }
 
 
 
+
+
+
+                            /* -----------------------------Section que l'on affiche les différentes pages selon le type de page ----------------------------- */
+
+
+
+
+
+
+function renderlogout() { // On se déconnecte en tant qu'utilisateur                                                // On se déconnecte en tant qu'utilisateur
+    API.logout()
+    updateHeader("Connexion", 'Login');
+    renderLogin()
+}
+
+function renderImages() { // On affiche les images                                                                  // On affiche les images
+timeout();
+eraseContent();
+updateHeader('Liste des photos', 'connected');
+$("#content").append(
+$(`
+<h2 style="margin-left:20px; margin-top:20px">En construction</h2>
+`))
+}
+
 function renderAbout() {                                                                                            // On affiche la page À propos
-    timeout();
-    saveContentScrollPosition();
-    eraseContent();
-    updateHeader("À propos...", "about");
+    timeout();// On déconnecte l'utilisateur après 5 minutes d'inactivité
+    saveContentScrollPosition(); // On sauvegarde la position du scroll
+    eraseContent(); // On efface le contenu
+    updateHeader("À propos...", "about"); // On met à jour le header
 
     $("#content").append(
         $(`
@@ -289,10 +322,10 @@ function renderAbout() {                                                        
 
 function renderLogin(Email = "", EmailError = "", passwordError = "", loginMessage = "") {                          // On se connecte en tant qu'utilisateur existant
 
-    API.logout();
-    eraseContent();
-    noTimeout();
-    updateHeader("Connexion", "Login");
+    API.logout(); // On se déconnecte
+    eraseContent(); // On efface le contenu
+    noTimeout(); // On arrête le timeout
+    updateHeader("Connexion", "Login"); // On met à jour le header
     if (EmailError == undefined) {
         EmailError = "";
     }
@@ -332,12 +365,12 @@ function renderLogin(Email = "", EmailError = "", passwordError = "", loginMessa
 
         
         `))
-    $('#createProfilCmd').on('click', renderRegister);
+    $('#createProfilCmd').on('click', renderRegister); // Quand on clique sur le bouton Nouveau compte
 
     $('#loginForm').on("submit", async function (event) {
-        let loginInfo = getFormData($('#loginForm'))
-        event.preventDefault();
-        showWaitingGif();
+        let loginInfo = getFormData($('#loginForm')) // On récupère les données du formulaire
+        event.preventDefault(); // On empêche le formulaire de se soumettre
+        showWaitingGif(); // On affiche le gif de chargement
         let result = await API.login(loginInfo.Email, loginInfo.Password)
         if (result) {
             let code = await API.retrieveLoggedUser();
@@ -356,7 +389,7 @@ function renderLogin(Email = "", EmailError = "", passwordError = "", loginMessa
         }
         else {
             switch (API.currentStatus) {
-                case 481:
+                case 481: // On affiche les erreurs selon le code d'erreur
                     { renderLogin('', 'Courriel introuvable'); break; }
                 case 482:
                     { renderLogin(loginInfo.Email, '', 'Mot de passe incorrect'); break; }
@@ -370,9 +403,9 @@ function renderLogin(Email = "", EmailError = "", passwordError = "", loginMessa
 }
 
 function renderVerifyForm() {                                                                                // On vérifie notre courriel pour pouvoir se connecter
-    eraseContent();
-    noTimeout();
-    updateHeader("Vérification", "verif");
+    eraseContent(); // On efface le contenu
+    noTimeout(); // On arrête le timeout
+    updateHeader("Vérification", "verif"); // On met à jour le header
     $("#content").append($(`
     <div class="content" style="text-align:center">
         <h5 style="margin-top:30px">Veuillez entrer le code de vérification que vous avez reçus par courriel</h5>
@@ -404,10 +437,10 @@ function renderVerifyForm() {                                                   
     });
 }
 
-function renderRegister() {                                                                                     // On s'inscrit en tant que nouvel utilisateur 
-    noTimeout();
-    eraseContent();
-    updateHeader("Inscription", "createProfil");
+function renderRegister() {                                                                                     // On s'inscrit en tant que nouvel utilisateur
+    noTimeout(); // On arrête le timeout
+    eraseContent(); // On efface le contenu
+    updateHeader("Inscription", "createProfil"); // On met à jour le header
 
     $("#content").append(
         $(`
@@ -478,25 +511,25 @@ function renderRegister() {                                                     
         </div>
         `))
 
-    $('#loginCmd').on('click', renderLogin);
-    $('#abortCmd').on('click', renderLogin);
-    initFormValidation();
-    initImageUploaders();
-    addConflictValidation(API.checkConflictURL(), 'Email', 'saveUserCmd');
+    $('#loginCmd').on('click', renderLogin); // Quand on clique sur le bouton Connexion
+    $('#abortCmd').on('click', renderLogin); // Quand on clique sur le bouton Annuler
+    initFormValidation(); // On initialise la validation du formulaire
+    initImageUploaders(); // On initialise l'upload d'image
+    addConflictValidation(API.checkConflictURL(), 'Email', 'saveUserCmd'); // On ajoute la validation de conflit
     $('#createProfilForm').on("submit", function (event) {
         let profil = getFormData($('#createProfilForm'));
         delete profil.matchedPassword;
         delete profil.matchedEmail;
         event.preventDefault();
         showWaitingGif();
-        createProfil(profil);
+        createProfil(profil); // On crée le profil relié au formulaire a l'api
     });
 }
 
-function renderModify() {                                                                                               // On modifie notre profil
-    let user = API.retrieveLoggedUser();
-    timeout();
-    eraseContent();
+function renderModify() {                                                                                               // On modifie notre profil en tant qu'utilisateur
+    let user = API.retrieveLoggedUser(); // On récupère l'utilisateur
+    timeout(); // On déconnecte l'utilisateur après 5 minutes d'inactivité
+    eraseContent(); // On efface le contenu
     $("#content").append($(`
     <form class="form" id="editProfilForm"'>
     <input type="hidden" name="Id" id="Id" value="${user.Id}"/>
@@ -585,15 +618,15 @@ function renderModify() {                                                       
             renderError("Une erreur c'est produite.");
         }
     });
-    $('#abortCmd').on('click', renderImages);
-    $('#killCmd').on("click", renderKill);
-    initFormValidation();
-    initImageUploaders();
+    $('#abortCmd').on('click', renderImages); // Quand on clique sur le bouton Annuler
+    $('#killCmd').on("click", renderKill); // Quand on clique sur le bouton Effacer le compte
+    initFormValidation(); // On initialise la validation du formulaire
+    initImageUploaders(); // On initialise l'upload d'image
 }
 
-function renderKill() {                                                                                                     // On efface notre compte
-    timeout();
-    eraseContent();
+function renderKill() {                                                                                                     // On efface notre compte en tant qu'utilisateur
+    timeout(); // On déconnecte l'utilisateur après 5 minutes d'inactivité
+    eraseContent(); // On efface le contenu
     $("#content").append($(`
     <div class="content" style="text-align:center">
         <h4 style="margin-top:30px">Voulez-vous vraiment effacer votre compte?</h4>
@@ -609,7 +642,7 @@ function renderKill() {                                                         
         let profil = API.retrieveLoggedUser();
         event.preventDefault();
         showWaitingGif();
-        let result = await API.unsubscribeAccount(profil.Id);
+        let result = await API.unsubscribeAccount(profil.Id); // On efface le compte relié à l'utilisateur
         if (result) {
             renderlogout();
             renderLogin();
@@ -618,4 +651,151 @@ function renderKill() {                                                         
         }
     });
     $('#cancelCmd').on("click", renderModify);
+}
+
+
+
+
+
+
+
+                                                        /* ----------------------------- Section Administrative ----------------------------- */
+
+
+
+
+
+async function renderUserManager() {                                                                                          // On gère les usagers
+    eraseContent(); // On efface le contenu
+    timeout(); // On déconnecte l'utilisateur après 5 minutes d'inactivité
+    updateHeader("Gestion des usagers", "UsersManager"); // On met à jour le header
+    let currentUserId = "";
+    let users = "";
+    let result1 = await API.GetAccounts();
+    if (result1) {
+        users = result1.data;
+        let result2 = await API.retrieveLoggedUser();
+        if (result2) {
+            currentUserId = result2.Id;
+            let buttonAdmin = "";
+            let buttonBlock = "";
+            users.forEach((user) => {
+                if (user.Authorizations.readAccess == 2 && user.Authorizations.writeAccess == 2) {
+                    buttonAdmin = '<button class="cmdIconVisible fas fa-user-cog dodgerblueCmd demoteCmd" style="border-width:0px" id="demoteCmd" userId="' + user.Id + '"/>';
+                } else {
+                    buttonAdmin = '<button class="cmdIconVisible fas fa-user-alt dodgerblueCmd promoteCmd" style="border-width:0px" id="promoteCmd" userId="' + user.Id + '"/>';
+                }
+                if (user.Authorizations.readAccess == 0 && user.Authorizations.writeAccess == 0) {
+                    buttonBlock = '<button class="cmdIconVisible fa fa-ban redCmd unblockCmd" style="border-width:0px" userId="' + user.Id + '"/>'
+                } else {
+                    buttonBlock = '<button class="cmdIconVisible fa-regular fa-circle greenCmd blockCmd" style="border-width:0px" userId="' + user.Id + '"/>';
+                }
+                if (user.Id != currentUserId) {
+                    $("#content").append($(`
+                    <div class="UserContainer">
+                        <div class="UserLayout">
+                            <img id="avatarUser" class="UserAvatar"src="${user.Avatar}"/>
+                            <div class="UserInfo">
+                                <span class="UserName">${user.Name}</span>
+                                <span class="UserEmail">${user.Email}</span>
+                            </div>
+                        </div>
+                        <div class="UserCommandPanel">
+                            ${buttonAdmin}
+                            ${buttonBlock}
+                            <button class="cmdIconVisible fas fa-user-slash goldenrodCmd removeCmd" style="border-width:0px" id="removeCmd" userid="${user.Id}"/>
+                        </div>
+                    </div>
+                    `));
+                }
+
+            });
+        }
+    }
+
+    $('.promoteCmd').on('click', async function () {                                                       // On promouvoit un usager
+        let userId = $(this).attr("userId");
+        let result = await API.getUserByIdPromote(userId); // On promouvoit l'usager relié à l'id
+        if (result) {
+            renderUserManager();
+        }
+        else {
+            renderError("Une erreur c'est produite.");
+        }
+    });
+    $('.demoteCmd').on('click', async function () {                                                         // On dégrade un usager
+        let userId = $(this).attr("userId");
+        let result = await API.getUserByIdDemote(userId); // On dégrade l'usager relié à l'id
+        if (result) {
+            renderUserManager();
+        }
+        else {
+            renderError("Une erreur c'est produite.")
+        }
+    });
+    $('.blockCmd').on('click', async function () {                                                          // On bloque un usager
+        let userId = $(this).attr("userId");
+        let result = await API.BlockUser(userId); // On bloque l'usager relié à l'id
+        if (result) {
+            renderUserManager();
+        }
+        else {
+            renderError("Une erreur c'est produite.");
+        }
+    });
+    $('.unblockCmd').on('click', async function () {                                                        // On débloque un usager
+        let userId = $(this).attr("userId");
+        let result = await API.getUserByIdDemote(userId); // On débloque l'usager relié à l'id
+        if (result) {
+            renderUserManager();
+        }
+        else {
+            renderError("Une erreur c'est produite.");
+        }
+    });
+    $('.removeCmd').on('click', async function () {                                                         // On efface un usager
+        let userId = $(this).attr("userId");
+        let result = await API.GetUser(userId);
+        if (result) {
+            renderKA(result); // On efface l'usager relié à l'id
+        }
+        else {
+            renderError("Une erreur c'est produite.");
+        }
+    });
+}
+
+function renderKA(user) {                                                                            // On efface un usager en tant qu'administrateur
+    eraseContent(); // On efface le contenu
+    timeout(); // On déconnecte l'utilisateur après 5 minutes d'inactivité
+    updateHeader("Retrait de compte", "UsersManager"); // On met à jour le header
+    $("#content").append($(`
+    <div class="content" style="text-align:center">
+        <h4 style="margin-top:30px">Voulez-vous vraiment effacer cet usager et toutes ses photos?</h4>
+        <div class="UserLayout">
+            <img id="avatarUser" class="UserAvatar"src="${user.Avatar}"/>
+            <div class="UserInfo">
+                <span class="UserName">${user.Name}</span>
+                <span class="UserEmail">${user.Email}</span>
+            </div>
+        </div>
+        <div class="form">
+            <button class="form-control btn-danger" id="deleteCmd">Effacer mon compte</button>
+        </div>
+        <div class="form">
+            <button class="form-control btn-secondary" id="cancelCmd">Annuler</button>
+        </div>
+    </div>
+    `));
+    $('#deleteCmd').on("click", async function (event) {
+        event.preventDefault();
+        showWaitingGif();
+        let result = await API.unsubscribeAccount(user.Id);
+        if (result) {
+            renderUserManager();
+        } else {
+            renderError("Une erreur c'est produite.");
+        }
+    });
+    $('#cancelCmd').on("click", renderUserManager);
 }

@@ -152,20 +152,6 @@ export default class Repository {
             this.write();
         }
     }
-    keepByFilter(filterFunc) {
-        let objectsList = this.objects();
-        if (objectsList) {
-            this.objectsList = objectsList.filter(filterFunc);
-            this.write();
-        }
-    }
-    findByFilter(filterFunc) {
-        let objectsList = this.objects();
-        if (objectsList) {
-            return objectsList.filter(filterFunc);
-        }
-        return null;
-    }
     findByField(fieldName, value, excludedId = 0) {
         if (fieldName) {
             let index = 0;
@@ -187,5 +173,19 @@ export default class Repository {
             index++;
         }
         return -1;
+    }
+    keepByFilter(filterFunc) {
+        let objectsList = this.objects();
+        if (objectsList) {
+            this.objectsList = objectsList.filter(filterFunc);
+            this.write();
+        }
+    }
+    findByFilter(filterFunc) {
+        let objectsList = this.objects();
+        if (objectsList) {
+            return objectsList.filter(filterFunc);
+        }
+        return null;
     }
 }
