@@ -243,4 +243,53 @@ class API {
             });
         });
     }
+
+    static GetUser(id) {
+        API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: serverHost + "/accounts/index/" + id,
+                contentType: 'text/plain',
+                type: 'GET',
+                headers: API.getBearerAuthorizationToken(),
+                success: profil => { resolve(profil); },
+                error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
+            });
+        });
+    }
+
+
+    static BlockUser(id) {
+        API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: serverHost + "/accounts/block/" + id,
+                contentType: 'text/plain',
+                type: 'GET',
+                headers: API.getBearerAuthorizationToken(),
+                data: {},
+                success: () => {
+                    resolve(true);
+                },
+                error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
+            });
+        });
+    }
+
+    static getUserByIdPromote(id) {
+        API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: serverHost + "/accounts/promote/" + id,
+                contentType: 'text/plain',
+                type: 'GET',
+                headers: API.getBearerAuthorizationToken(),
+                data: {},
+                success: () => {
+                    resolve(true);
+                },
+                error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
+            });
+        });
+    }
 }

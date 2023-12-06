@@ -20,7 +20,7 @@ function Init_UI() {                                                            
 
 
 
-                                                                /* ----------------------------- Fonctions utiles ----------------------------- */
+/* ----------------------------- Fonctions utiles ----------------------------- */
 
 
 
@@ -59,7 +59,7 @@ function getFormData($form) { // On récupère les données du formulaire
 
 
 
-        /* ----------------------------- Section que l'on Update le header selon le type de page  ainsi que les types de permissions de l'utilisateur -----------------------------  */
+/* ----------------------------- Section que l'on Update le header selon le type de page  ainsi que les types de permissions de l'utilisateur -----------------------------  */
 
 
 
@@ -272,7 +272,7 @@ function updateHeader(title, type) {                                            
 
 
 
-                            /* -----------------------------Section que l'on affiche les différentes pages selon le type de page ----------------------------- */
+/* -----------------------------Section que l'on affiche les différentes pages selon le type de page ----------------------------- */
 
 
 
@@ -659,7 +659,7 @@ function renderKill() {                                                         
 
 
 
-                                                        /* ----------------------------- Section Administrative ----------------------------- */
+ /* ----------------------------- Section Administrative ----------------------------- */
 
 
 
@@ -798,4 +798,21 @@ function renderKA(user) {                                                       
         }
     });
     $('#cancelCmd').on("click", renderUserManager);
+}
+
+function renderError(message) {
+    $('body').append(`
+        <div class='popupError'> 
+            <div class='popupContentError'>
+                <div>
+                    <div class='popupHeaderError errorMessage'>${message}</div>
+                </div>
+                <div onclick='closePopupError(); ' class='close-btn fa fa-close'></div> 
+            </div>
+        </div> 
+    `);
+}
+
+function closePopupError() {
+    $(".popupError").hide();
 }
