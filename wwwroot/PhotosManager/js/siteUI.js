@@ -3,7 +3,7 @@ let contentScrollPosition = 0;
 
 
 
-/* ----------------------------- Section d'initialisation ----------------------------- */
+                                                    /* ----------------------------- Section d'initialisation ----------------------------- */
 
 
 
@@ -20,7 +20,7 @@ function Init_UI() {                                                            
 
 
 
-/* ----------------------------- Fonctions utiles ----------------------------- */
+                                                        /* ----------------------------- Fonctions utiles ----------------------------- */
 
 
 
@@ -59,7 +59,7 @@ function getFormData($form) { // On récupère les données du formulaire
 
 
 
-/* ----------------------------- Section que l'on Update le header selon le type de page  ainsi que les types de permissions de l'utilisateur -----------------------------  */
+            /* ----------------------------- Section que l'on Update le header selon le type de page  ainsi que les types de permissions de l'utilisateur -----------------------------  */
 
 
 
@@ -272,7 +272,7 @@ function updateHeader(title, type) {                                            
 
 
 
-/* -----------------------------Section que l'on affiche les différentes pages selon le type de page ----------------------------- */
+                        /* -----------------------------Section que l'on affiche les différentes pages selon le type de page ----------------------------- */
 
 
 
@@ -654,12 +654,24 @@ function renderKill() {                                                         
 }
 
 
+function renderServerError() {                                                                              // On affiche une erreur de serveur 
+    eraseContent(); // On efface le contenu
+    updateHeader("Problème", "Login");
+    $("#content").append($(`<div class="content" style="text-align:center">
+        <span style='color:red; font-weight:bold;'>Le serveur ne répond pas</span>
+        <hr>
+        <div class="form">
+            <button class="form-control btn-primary" id="connectCmd">Connexion</button>
+        </div>
+        </div>
+    `));
+    $("#connectCmd").on("click", renderLogin); // Quand on clique sur le bouton Connexion
+}
 
 
 
 
-
- /* ----------------------------- Section Administrative ----------------------------- */
+                                                /* ----------------------------- Section Administrative ----------------------------- */
 
 
 
