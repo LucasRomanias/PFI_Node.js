@@ -39,7 +39,7 @@
     border-radius: 9px;
     background-color: white;
     display: grid;
-    grid-template-columns: 50px auto auto;
+    grid-template-columns: 50px auto 50px 50px;
     width: 100%;
     height: auto;
     align-items: center;
