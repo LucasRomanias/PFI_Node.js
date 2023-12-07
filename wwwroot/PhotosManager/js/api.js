@@ -1,6 +1,6 @@
 ////////////////////////////////////////////// API photos_APIs call ///////////////////////////////////////////////////////
 
-const serverHost = "http://localhost:5000";
+const serverHost = "https://alike-wooded-sphere.glitch.me";
 const photos_API = "/api/photos";
 
 class API {
