@@ -3,7 +3,7 @@ let contentScrollPosition = 0;
 
 
 
-                                                            /* ----------------------------- Section d'initialisation ----------------------------- */
+/* ----------------------------- Section d'initialisation ----------------------------- */
 
 
 
@@ -733,7 +733,7 @@ async function renderUserManager() {                                            
             renderError("Une erreur c'est produite.")
         }
     });
-    $('.blockCmd').on('click', async function () {                                                          // On bloque un usager
+    $('.blockCmd').on('click', async function () {  // On bloque un usager
         let userId = $(this).attr("userId");
         let result = await API.BlockUser(userId); // On bloque l'usager relié à l'id
         if (result) {
@@ -743,7 +743,7 @@ async function renderUserManager() {                                            
             renderError("Une erreur c'est produite.");
         }
     });
-    $('.unblockCmd').on('click', async function () {                                                        // On débloque un usager
+    $('.unblockCmd').on('click', async function () { // On débloque un usager
         let userId = $(this).attr("userId");
         let result = await API.getUserByIdDemote(userId); // On débloque l'usager relié à l'id
         if (result) {
@@ -753,7 +753,7 @@ async function renderUserManager() {                                            
             renderError("Une erreur c'est produite.");
         }
     });
-    $('.removeCmd').on('click', async function () {                                                         // On efface un usager
+    $('.removeCmd').on('click', async function () {  // On efface un usager
         let userId = $(this).attr("userId");
         let result = await API.GetUser(userId);
         if (result) {
@@ -765,7 +765,7 @@ async function renderUserManager() {                                            
     });
 }
 
-function renderKA(user) {                                                                            // On efface un usager en tant qu'administrateur
+function renderKA(user) {    // On efface un usager en tant qu'administrateur
     eraseContent(); // On efface le contenu
     timeout(); // On déconnecte l'utilisateur après 5 minutes d'inactivité
     updateHeader("Retrait de compte", "UsersManager"); // On met à jour le header

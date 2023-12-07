@@ -58,7 +58,6 @@ export default class AccountsController extends Controller {
     }
 
     sendVerificationEmail(user) {      
-        
         let html = `
                 Bonjour ${user.Name}, <br /> <br />
                 Voici votre code pour confirmer votre adresse de courriel

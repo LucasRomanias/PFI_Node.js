@@ -292,4 +292,21 @@ class API {
             });
         });
     }
+
+    static getUserByIdDemote(id) {
+        API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: serverHost + "/accounts/demote/" + id,
+                contentType: 'text/plain',
+                type: 'GET',
+                headers: API.getBearerAuthorizationToken(),
+                data: {},
+                success: () => {
+                    resolve(true);
+                },
+                error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
+            });
+        });
+    }
 }
